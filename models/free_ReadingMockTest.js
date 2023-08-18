@@ -1,57 +1,12 @@
-// free_ReadingMockTest.js
 const mongoose = require("mongoose");
 
+const passageSchema = new mongoose.Schema({
+  passage: String,
+});
+
 const questionSchema = new mongoose.Schema({
-  question_text: {
-    type: String,
-    required: true,
-  },
-  options: {
-    type: [String],
-    required: true,
-  },
-  correct_option: {
-    type: Number,
-    required: true,
-  },
-});
-
-const fillInTheBlanksSchema = new mongoose.Schema({
-  question: {
-    type: String,
-    required: true,
-  },
-  blanks: [
-    {
-      blank_id: {
-        type: Number,
-        required: true,
-      },
-      options: {
-        type: [String],
-        required: true,
-      },
-      correct_option: {
-        type: String,
-        required: true,
-      },
-    },
-  ],
-});
-
-const dragAndDropSchema = new mongoose.Schema({
-  questionText: {
-    type: String,
-    required: true,
-  },
-  randomOrder: {
-    type: [String],
-    required: true,
-  },
-  correctOrder: {
-    type: [String],
-    required: true,
-  },
+  question: String,
+  answer: String,
 });
 
 const freeReadingMockSchema = new mongoose.Schema({
@@ -59,15 +14,14 @@ const freeReadingMockSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  passages: [passageSchema],
   questions: [questionSchema],
-  fillInTheBlanks: fillInTheBlanksSchema,
-  dragAndDrop: dragAndDropSchema,
 });
 
-const freeReadingMock = mongoose.model(
-  "freeReadingMock",
+const FreeReadingMock = mongoose.model(
+  "FreeReadingMock",
   freeReadingMockSchema,
   "FREE-ReadingMockTestData"
 );
 
-module.exports = freeReadingMock;
+module.exports = FreeReadingMock;

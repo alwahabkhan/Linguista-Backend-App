@@ -3,11 +3,13 @@ const freeMock = require("../models/free_ReadingMockTest");
 
 const free = async (req, res) => {
   try {
-    const data = await freeMock
-      .find({})
-      .select(
-        "-questions.correct_option -fillInTheBlanks.blanks.correct_option -dragAndDrop.correctOrder"
-      );
+    const data = await freeMock.find({}).select({
+      "questions.correct_choice": 0,
+      "passages.questions.correct_choice": 0,
+      "passages.fillInTheBlanks.blanks.correct_choice": 0,
+      "passages.dragAndDrop.correct_choice": 0,
+    });
+
     res.statusCode = 200;
     res.setHeader("Content-Type", "application/json");
     res.json(data);
