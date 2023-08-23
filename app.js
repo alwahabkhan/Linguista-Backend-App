@@ -17,6 +17,7 @@ var freeMockTest = require("./routes/free_writingMockTest");
 var evaluaterRouter = require("./routes/evaluater");
 var freeReadingMockTest = require("./routes/free_readingMockTest");
 var readingEvaluaterRouter = require("./routes/reading_evaluater");
+var freelisteningMockTest = require("./routes/free_listneningMockTest");
 
 var app = express();
 
@@ -63,6 +64,7 @@ app.use("/free-mock-test", freeMockTest);
 app.use("/evaluator", evaluaterRouter);
 app.use("/free-reading-mock-test", freeReadingMockTest);
 app.use("/readingEvaluater", readingEvaluaterRouter);
+app.use("/free-listening-mock-test", freelisteningMockTest);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
