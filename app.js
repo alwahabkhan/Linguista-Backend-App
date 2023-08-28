@@ -32,11 +32,12 @@ mongoose
   })
   .then(() => {
     console.log("Connected to MongoDB");
+    console.log("database is mongoDb")
   })
   .catch((err) => {
     console.log(err);
     console.log("Connection Failed");
-  });
+  });s
 //Librareis
 app.use(helmet());
 app.use(cors());
