@@ -1,5 +1,9 @@
 var authenticate = require("../authenticate");
 const writingResult = require("../models/free_MockTest");
+const axios = require('axios');
+const compromise = require('compromise');
+
+const grammarApiUrl = 'https://languagetool.org/api/v2/check';
 
 const evaluateEssay = async (req, res) => {
   try {
@@ -8,13 +12,26 @@ const evaluateEssay = async (req, res) => {
 
     // Now question_ids will contain ["64ba1117dfbf013551f50f90", "64ba1117dfbf013551f50f91", "64ba1117dfbf013551f50f92"]
     
+    const grammarPromises = question_answers.map(async (answer) => {
+      try {
+        const grammarResponse = await axios.post(grammarApiUrl, `text=${encodeURIComponent(answer)}&language=en-US`);
+        const grammarMatches = grammarResponse.data.matches;
+        return { answer, grammarMatches };
+      } catch (error) {
+        console.error('Error checking grammar:', error.message);
+        return { answer, grammarMatches: [] };
+      }
+    });
+
+    const grammarResults = await Promise.all(grammarPromises);
+
     for (const id of question_ids) {
       const question = await writingResult.findById(id);
       console.log(question.question_text);
       // You can process each question here
     }
 
-    res.status(200).json({ value: 10 });
+    res.status(200).json({ grammarResults });
   } catch (error) {
     console.error(error); // Log the error to the console
     res.status(500).json({ error: "Internal server error" });
