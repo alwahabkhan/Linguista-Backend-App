@@ -65,8 +65,8 @@ module.exports = {
  */
 var authenticate = require("../authenticate");
 const writingResult = require("../models/free_MockTest");
-const axios = require('axios');
-const compromise = require('compromise');
+const axios = require("axios");
+const compromise = require("compromise");
 
 const evaluateEssay = async (req, res) => {
   try {
@@ -74,7 +74,7 @@ const evaluateEssay = async (req, res) => {
     const question_answers = req.body.question_answers;
 
     // LanguageTool API endpoint
-    const grammarApiUrl = 'https://languagetool.org/api/v2/check';
+    const grammarApiUrl = "https://languagetool.org/api/v2/check";
 
     let totalCorrectAnswers = 0; // Initialize total correct answers
 
@@ -86,7 +86,10 @@ const evaluateEssay = async (req, res) => {
       const question_answer = question_answers[i];
 
       // Make a POST request to the LanguageTool API for grammar checking
-      const grammarResponse = await axios.post(grammarApiUrl, `text=${encodeURIComponent(question_answer)}&language=en-US`);
+      const grammarResponse = await axios.post(
+        grammarApiUrl,
+        `text=${encodeURIComponent(question_answer)}&language=en-US`
+      );
       const grammarMatches = grammarResponse.data.matches;
 
       // Check if the answer has no grammar mistakes
@@ -113,9 +116,9 @@ const evaluateEssay = async (req, res) => {
       // ...
 
       // Logging for debugging
-      console.log('Question Answer:', question_answer);
-      console.log('Grammar Issues:', grammarMatches);
-      console.log('Sentences:', sentences);
+      console.log("Question Answer:", question_answer);
+      console.log("Grammar Issues:", grammarMatches);
+      console.log("Sentences:", sentences);
     }
 
     // Calculate the score as a percentage of correct answers
