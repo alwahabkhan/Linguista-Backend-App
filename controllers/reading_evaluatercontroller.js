@@ -1,53 +1,43 @@
 var authenticate = require("../authenticate");
-const readingResult = require("../models/free_ReadingMockTest");
+const FreeReadingMock = require("../models/free_ReadingMockTest");
 
-const evaluateReading = async (req, res) => {
+const evaluateReadingTest = async (req, res) => {
   try {
-    const _id = req.body._id;
-    const questions_userAnswer = req.body.question_userAnswer;
-    const fillInTheBlanks_userAnswer = req.body.question_userAnswer;
-    const dragAndDrop_userAnswer = req.body.question_userAnswer;
+    const evaluations = req.body; // Array of evaluations
+    const results = [];
 
-    const question = await readingResult.findById(_id);
+    for (const evaluation of evaluations) {
+      const { question_evaluationId, question_answers } = evaluation;
+      const question_evaluation = await FreeReadingMock.findById(question_evaluationId);
 
-    if (!question) {
-      return res.status(404).json({ error: "Question not found" });
+      const correctAnswers = question_evaluation.questions.map(question => question.correct_choice);
+
+      let totalMarks = 0;
+      const evaluationResults = [];
+
+      for (let i = 0; i < question_evaluation.questions.length; i++) {
+        const userAnswer = question_answers[i];
+        const correctAnswer = correctAnswers[i];
+        
+        if (userAnswer === correctAnswer) {
+          totalMarks++;
+          evaluationResults.push('Correct');
+        } else {
+          evaluationResults.push('Incorrect');
+        }
+      }
+
+      results.push({ totalMarks, evaluationResults });
     }
 
-    // Log question_text from questions array
-    if (question.questions && question.questions.length > 0) {
-      console.log("Question Text:", question.questions[0].question_text);
-    }
+    const overallTotalMarks = results.reduce((acc, evaluation) => acc + evaluation.totalMarks, 0);
+    const overallTotalQuestions = results.reduce((acc, evaluation) => acc + evaluation.evaluationResults.length, 0);
 
-    // Log fillInTheBlanks question
-    if (question.fillInTheBlanks) {
-      console.log(
-        "Fill in the Blanks Question:",
-        question.fillInTheBlanks.question
-      );
-    }
-
-    // Log dragAndDrop questionText
-    if (question.dragAndDrop) {
-      console.log(
-        "Drag and Drop Question Text:",
-        question.dragAndDrop.questionText
-      );
-    }
-
-    // Log user answers
-    console.log("User Answers:", {
-      questions_userAnswer: req.body.question_userAnswer,
-      fillInTheBlanks_userAnswer: req.body.fillInTheBlanks_userAnswer,
-      dragAndDrop_userAnswer: req.body.dragAndDrop_userAnswer,
-    });
-
-    res.status(200).json({ value: 10 });
+    res.json({ results, overallTotalMarks, overallTotalQuestions });
   } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
+    console.error('Error generating results:', error);
+    res.status(500).json({ error: 'An error occurred while generating results.' });
   }
 };
 
-module.exports = {
-  evaluateReading,
-};
+module.exports = evaluateReadingTest;

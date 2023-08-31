@@ -33,6 +33,7 @@ mongoose
   })
   .then(() => {
     console.log("Connected to MongoDB");
+    console.log("database is mongoDb")
   })
   .catch((err) => {
     console.log(err);

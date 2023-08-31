@@ -1,12 +1,15 @@
 const mongoose = require("mongoose");
 
-const passageSchema = new mongoose.Schema({
-  passage: String,
-});
-
 const questionSchema = new mongoose.Schema({
   question: String,
-  answer: String,
+  choices: [String],
+  correct_choice: String
+});
+
+const passageSchema = new mongoose.Schema({
+  _id: mongoose.Schema.Types.ObjectId,
+  passage: String,
+  questions: [questionSchema]
 });
 
 const freeReadingMockSchema = new mongoose.Schema({
