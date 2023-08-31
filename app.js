@@ -37,7 +37,7 @@ mongoose
   .catch((err) => {
     console.log(err);
     console.log("Connection Failed");
-  });s
+  });
 //Librareis
 app.use(helmet());
 app.use(cors());
