@@ -63,10 +63,12 @@ module.exports = {
   evaluateEssay,
 };
  */
-var authenticate = require("../authenticate");
-const writingResult = require("../models/free_MockTest");
 const axios = require('axios');
 const compromise = require('compromise');
+const writingResult = require("../models/free_MockTest");
+//const syllableCount = require('syllable-count'); // Import syllable-count module
+const natural = require('natural');
+const textReadability = require('text-readability');
 
 const evaluateEssay = async (req, res) => {
   try {
@@ -79,6 +81,9 @@ const evaluateEssay = async (req, res) => {
     let totalCorrectAnswers = 0; // Initialize total correct answers
 
     const allMistakes = []; // To store all mistakes for each answer
+
+    const rareWords = []; // Initialize arrays to store rare and complex words
+    const complexWords = [];
 
     // Iterate over each question answer
     for (let i = 0; i < question_ids.length; i++) {
@@ -103,16 +108,30 @@ const evaluateEssay = async (req, res) => {
       });
 
       // Use compromise to tokenize and analyze text for basic coherence and cohesion
-      const sentences = compromise(question_answer).sentences();
+      const doc = compromise(question_answer);
+      const sentences = doc.sentences();
+
+      // Inside the loop where you're processing terms
+      doc.terms().forEach(term => {
+        const word = term.out('text');
+        const wordCount = term.wordCount();
+  
+        // Calculate the Automated Readability Index using the text-readability package
+        const readabilityScore = textReadability.automatedReadabilityIndex(word);
+  
+        if (wordCount === 1 && word.length > 3) {
+          rareWords.push(word);
+        }
+        if (readabilityScore >= 7) {
+          complexWords.push(word);
+        }
+      });
+  
 
       // Now you can also process the database question using the question_id
       const question = await writingResult.findById(question_id);
       console.log(question.question_text);
 
-      // Perform any other necessary processing
-      // ...
-
-      // Logging for debugging
       console.log('Question Answer:', question_answer);
       console.log('Grammar Issues:', grammarMatches);
       console.log('Sentences:', sentences);
@@ -125,10 +144,17 @@ const evaluateEssay = async (req, res) => {
     // Round the total score according to your requirements
     totalScore = Math.round(totalScore * 2) / 2; // Round to nearest 0.5
 
-    res.status(200).json({ totalScore, allMistakes });
+    res.status(200).json({
+      totalScore,
+      allMistakes,
+      rareWords,
+      complexWords
+    });
   } catch (error) {
     console.error(error); // Log the error to the console
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({
+      error: "Internal server error"
+    });
   }
 };
 
