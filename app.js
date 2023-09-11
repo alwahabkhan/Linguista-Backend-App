@@ -10,7 +10,7 @@ const session = require("express-session");
 const FileStore = require("session-file-store")(session);
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
-
+var router = express.Router();
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var freeMockTest = require("./routes/free_writingMockTest");
@@ -19,7 +19,7 @@ var freeReadingMockTest = require("./routes/free_readingMockTest");
 var readingEvaluaterRouter = require("./routes/reading_evaluater");
 var freelisteningMockTest = require("./routes/free_listneningMockTest");
 var freeSpeakingMockTest = require("./routes/free_speakingMockTest");
-
+var WritingMockTestDataGT=require("./routes/free_writingGeneralTrainingMockTest");
 var app = express();
 
 // view engine setup
@@ -67,7 +67,7 @@ app.use("/free-reading-mock-test", freeReadingMockTest);
 app.use("/readingEvaluater", readingEvaluaterRouter);
 app.use("/free-listening-mock-test", freelisteningMockTest);
 app.use("/free-Speaking-mock-test", freeSpeakingMockTest);
-
+app.use("/free-writing-mock-test",WritingMockTestDataGT);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
@@ -83,5 +83,22 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render("error");
 });
+// Add this middleware after your routes
+router.use((req, res, next) => {
+  const error = new Error("Not Found");
+  error.status = 404;
+  next(error);
+});
+
+// Error handling middleware
+router.use((err, req, res, next) => {
+  res.status(err.status || 500);
+  res.json({
+    error: {
+      message: err.message,
+    },
+  });
+});
+
 
 module.exports = app;
